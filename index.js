@@ -9357,26 +9357,13 @@ function encodeBase64(_data4) {
   return btoa(textData);
 }
 class EventPayload {
-  /**
-   *  Create a new **EventPayload** for %%emitter%% with
-   *  the %%listener%% and for %%filter%%.
-   */
   constructor(emitter, listener, filter) {
-    /**
-     *  The event filter.
-     */
     __publicField(this, "filter");
-    /**
-     *  The **EventEmitterable**.
-     */
     __publicField(this, "emitter");
     __privateAdd(this, _listener, void 0);
     __privateSet(this, _listener, listener);
     defineProperties(this, { emitter, filter });
   }
-  /**
-   *  Unregister the triggered listener for future events.
-   */
   async removeListener() {
     if (__privateGet(this, _listener) == null) {
       return;
@@ -9643,12 +9630,6 @@ function checkSignal(signal) {
   return signal;
 }
 const _FetchRequest = class {
-  /**
-   *  Create a new FetchRequest instance with default values.
-   *
-   *  Once created, each property may be set before issuing a
-   *  ``.send()`` to make teh request.
-   */
   constructor(url) {
     __privateAdd(this, _send);
     __privateAdd(this, _allowInsecure, void 0);
@@ -10231,9 +10212,6 @@ const _FixedNumber = class {
   // Use this when changing this file to get some typing info,
   // but then switch to any to mask the internal type
   //constructor(guard: any, value: bigint, format: _FixedFormat) {
-  /**
-   *  @private
-   */
   constructor(guard, value, format) {
     __privateAdd(this, _checkFormat);
     __privateAdd(this, _checkValue);
@@ -10241,20 +10219,12 @@ const _FixedNumber = class {
     __privateAdd(this, _sub);
     __privateAdd(this, _mul);
     __privateAdd(this, _div);
-    /**
-     *  The specific fixed-point arithmetic field for this value.
-     */
     __publicField(this, "format");
     __privateAdd(this, _format, void 0);
     // The actual value (accounting for decimals)
     __privateAdd(this, _val, void 0);
     // A base-10 value to multiple values by to maintain the magnitude
     __privateAdd(this, _tens, void 0);
-    /**
-     *  This is a property so console.log shows a human-meaningful value.
-     *
-     *  @private
-     */
     __publicField(this, "_value");
     assertPrivate(guard, _guard$3, "FixedNumber");
     __privateSet(this, _val, value);
@@ -10635,9 +10605,6 @@ function throwError(name, error) {
   throw wrapped;
 }
 const _Result = class extends Array {
-  /**
-   *  @private
-   */
   constructor(...args) {
     const guard = args[0];
     let items = args[1];
@@ -10719,9 +10686,6 @@ const _Result = class extends Array {
       return accum;
     }, {});
   }
-  /**
-   *  @_ignore
-   */
   slice(start, end) {
     if (start == null) {
       start = 0;
@@ -10736,9 +10700,6 @@ const _Result = class extends Array {
     }
     return new _Result(_guard$2, result, names2);
   }
-  /**
-   *  @_ignore
-   */
   filter(callback, thisArg) {
     const result = [], names2 = [];
     for (let i = 0; i < this.length; i++) {
@@ -10764,10 +10725,6 @@ const _Result = class extends Array {
     }
     return value;
   }
-  /**
-   *  Creates a new [[Result]] for %%items%% with each entry
-   *  also accessible by its corresponding name in %%keys%%.
-   */
   static fromItems(items, keys) {
     return new _Result(_guard$2, items, keys);
   }
@@ -10835,7 +10792,6 @@ class Writer {
     }
     return __privateMethod(this, _writeData, writeData_fn).call(this, bytes2);
   }
-  // Numeric item; pad on the left *to* WordSize
   writeValue(value) {
     return __privateMethod(this, _writeData, writeData_fn).call(this, getValue$1(value));
   }
@@ -11716,7 +11672,7 @@ function keccakP(s, rounds = 24) {
   B2.fill(0);
 }
 class Keccak extends Hash {
-  // NOTE: we accept arguments in bytes instead of bits here.
+  // NOTE: accept arguments in bytes instead of bits here.
   constructor(blockLen, suffix, outputLen, enableXOF = false, rounds = 24) {
     super();
     this.blockLen = blockLen;
@@ -12881,9 +12837,6 @@ function toUint256(value) {
   return zeroPadValue(toBeArray(value), 32);
 }
 const _Signature = class {
-  /**
-   *  @private
-   */
   constructor(guard, r2, s, v2) {
     __privateAdd(this, _r, void 0);
     __privateAdd(this, _s, void 0);
@@ -12895,9 +12848,6 @@ const _Signature = class {
     __privateSet(this, _v, v2);
     __privateSet(this, _networkV, null);
   }
-  /**
-   *  The ``r`` value for a signautre.
-   */
   get r() {
     return __privateGet(this, _r);
   }
@@ -12905,9 +12855,6 @@ const _Signature = class {
     assertArgument(dataLength(value) === 32, "invalid r", "value", value);
     __privateSet(this, _r, hexlify(value));
   }
-  /**
-   *  The ``s`` value for a signature.
-   */
   get s() {
     return __privateGet(this, _s);
   }
@@ -12917,9 +12864,6 @@ const _Signature = class {
     assertArgument(parseInt(value.substring(0, 3)) < 8, "non-canonical s", "value", value);
     __privateSet(this, _s, value);
   }
-  /**
-   *  The ``v`` value for a signature.
-   */
   get v() {
     return __privateGet(this, _v);
   }
@@ -12938,9 +12882,6 @@ const _Signature = class {
     }
     return _Signature.getChainId(v2);
   }
-  /**
-   *  The ``yParity`` for the signature.
-   */
   get yParity() {
     return this.v === 27 ? 0 : 1;
   }
@@ -13084,9 +13025,6 @@ utils.hmacSha256Sync = function(key, ...messages) {
   return getBytes(computeHmac("sha256", key, concat(messages)));
 };
 const _SigningKey = class {
-  /**
-   *  Creates a new **SigningKey** for %%privateKey%%.
-   */
   constructor(privateKey) {
     __privateAdd(this, _privateKey, void 0);
     assertArgument(dataLength(privateKey) === 32, "invalid private key", "privateKey", "[REDACTED]");
@@ -15973,9 +15911,6 @@ const FallbackFragmentInternal = "_FallbackInternal";
 const FunctionFragmentInternal = "_FunctionInternal";
 const StructFragmentInternal = "_StructInternal";
 const _ParamType = class {
-  /**
-   *  @private
-   */
   constructor(guard, name, type, baseType, indexed, components, arrayLength, arrayChildren) {
     __privateAdd(this, _walkAsync);
     __publicField(this, "name");
@@ -16167,9 +16102,6 @@ const _ParamType = class {
     type = verifyBasicType(obj.type);
     return new _ParamType(_guard, name || "", type, type, indexed, null, null, null);
   }
-  /**
-   *  Returns true if %%value%% is a **ParamType**.
-   */
   static isParamType(value) {
     return value && value[internal$1] === ParamTypeInternal;
   }
@@ -16419,9 +16351,6 @@ class EventFragment extends NamedFragment {
   }
 }
 class ConstructorFragment extends Fragment {
-  /**
-   *  @private
-   */
   constructor(guard, type, inputs, payable, gas) {
     super(guard, type, inputs);
     __publicField(this, "payable");
@@ -16470,9 +16399,6 @@ class ConstructorFragment extends Fragment {
 class FallbackFragment extends Fragment {
   constructor(guard, inputs, payable) {
     super(guard, "fallback", inputs);
-    /**
-     *  If the function can be sent value during invocation.
-     */
     __publicField(this, "payable");
     Object.defineProperty(this, internal$1, { value: FallbackFragmentInternal });
     defineProperties(this, { payable });
@@ -17048,9 +16974,6 @@ const _Interface = class {
     }
     return null;
   }
-  /**
-   *  Iterate over all errors, calling %%callback%%, sorted by their name.
-   */
   forEachError(callback) {
     const names2 = Array.from(__privateGet(this, _errors).keys());
     names2.sort((a, b2) => a.localeCompare(b2));
@@ -17093,10 +17016,6 @@ const _Interface = class {
   _encodeParams(params, values) {
     return __privateGet(this, _abiCoder).encode(params, values);
   }
-  /**
-   *  Encodes a ``tx.data`` object for deploying the Contract with
-   *  the %%values%% as the constructor arguments.
-   */
   encodeDeploy(values) {
     return this._encodeParams(this.deploy.inputs, values || []);
   }
@@ -17140,15 +17059,6 @@ const _Interface = class {
       this._encodeParams(fragment.inputs, values || [])
     ]);
   }
-  /**
-   *  Decodes the result %%data%% (e.g. from an ``eth_call``) for the
-   *  specified function (see [[getFunction]] for valid values for
-   *  %%key%%).
-   *
-   *  Most developers should prefer the [[parseCallResult]] method instead,
-   *  which will automatically detect a ``CALL_EXCEPTION`` and throw the
-   *  corresponding error.
-   */
   decodeFunctionResult(fragment, data) {
     if (typeof fragment === "string") {
       const f2 = this.getFunction(fragment);
@@ -17575,10 +17485,6 @@ function toJson(value) {
   return value.toString();
 }
 class FeeData {
-  /**
-   *  Creates a new FeeData for %%gasPrice%%, %%maxFeePerGas%% and
-   *  %%maxPriorityFeePerGas%%.
-   */
   constructor(gasPrice, maxFeePerGas, maxPriorityFeePerGas) {
     __publicField(this, "gasPrice");
     __publicField(this, "maxFeePerGas");
@@ -17589,9 +17495,6 @@ class FeeData {
       maxPriorityFeePerGas: getValue(maxPriorityFeePerGas)
     });
   }
-  /**
-   *  Returns a JSON-friendly value.
-   */
   toJSON() {
     const { gasPrice, maxFeePerGas, maxPriorityFeePerGas } = this;
     return {
@@ -17688,11 +17591,6 @@ class Block {
       return tx.hash;
     });
   }
-  /**
-   *  Returns the complete transactions for blocks which
-   *  prefetched them, by passing ``true`` to %%prefetchTxs%%
-   *  into [[provider_getBlock]].
-   */
   get prefetchedTransactions() {
     const txs = __privateGet(this, _transactions).slice();
     if (txs.length === 0) {
@@ -17703,9 +17601,6 @@ class Block {
     });
     return txs;
   }
-  /**
-   *  Returns a JSON-friendly value.
-   */
   toJSON() {
     const { baseFeePerGas, difficulty, extraData, gasLimit, gasUsed, hash: hash2, miner, nonce, number: number2, parentHash, timestamp, transactions } = this;
     return {
@@ -17739,24 +17634,15 @@ class Block {
       }
     };
   }
-  /**
-   *  The number of transactions in this block.
-   */
   get length() {
     return __privateGet(this, _transactions).length;
   }
-  /**
-   *  The [[link-js-date]] this block was included at.
-   */
   get date() {
     if (this.timestamp == null) {
       return null;
     }
     return new Date(this.timestamp * 1e3);
   }
-  /**
-   *  Get the transaction at %%indexe%% within this block.
-   */
   async getTransaction(indexOrHash) {
     let tx = void 0;
     if (typeof indexOrHash === "number") {
@@ -17801,18 +17687,9 @@ class Block {
     }
     assertArgument(false, "no matching transaction", "indexOrHash", indexOrHash);
   }
-  /**
-   *  Has this block been mined.
-   *
-   *  If true, the block has been typed-gaurded that all mined
-   *  properties are non-null.
-   */
   isMined() {
     return !!this.hash;
   }
-  /**
-   *
-   */
   isLondon() {
     return !!this.baseFeePerGas;
   }
@@ -18250,15 +18127,6 @@ const _TransactionResponse = class {
     assert$1(!other || other.isMined(), "unmined 'other' transaction canot be orphaned", "UNSUPPORTED_OPERATION", { operation: "removeEvent()" });
     return createReorderedTransactionFilter(this, other);
   }
-  /**
-   *  Returns a new TransactionResponse instance which has the ability to
-   *  detect (and throw an error) if the transaction is replaced, which
-   *  will begin scanning at %%startBlock%%.
-   *
-   *  This should generally not be used by developers and is intended
-   *  primarily for internal use. Setting an incorrect %%startBlock%% can
-   *  have devastating performance consequences if used incorrectly.
-   */
   replaceableTransaction(startBlock) {
     assertArgument(Number.isInteger(startBlock) && startBlock >= 0, "invalid startBlock", "startBlock", startBlock);
     const tx = new _TransactionResponse(this, this.provider);
@@ -19106,17 +18974,8 @@ const matchers = [
 const _EnsResolver = class {
   constructor(provider, address, name) {
     __privateAdd(this, _fetch);
-    /**
-     *  The connected provider.
-     */
     __publicField(this, "provider");
-    /**
-     *  The address of the resolver.
-     */
     __publicField(this, "address");
-    /**
-     *  The name this resovler was resolved against.
-     */
     __publicField(this, "name");
     // For EIP-2544 names, the ancestor that provided the resolver
     __privateAdd(this, _supports2544, void 0);
@@ -19132,9 +18991,6 @@ const _EnsResolver = class {
       "function contenthash() view returns (bytes)"
     ], provider));
   }
-  /**
-   *  Resolves to true if the resolver supports wildcard resolution.
-   */
   async supportsWildcard() {
     if (__privateGet(this, _supports2544) == null) {
       __privateSet(this, _supports2544, (async () => {
@@ -19151,10 +19007,6 @@ const _EnsResolver = class {
     }
     return await __privateGet(this, _supports2544);
   }
-  /**
-   *  Resolves to the address for %%coinType%% or null if the
-   *  provided %%coinType%% has not been configured.
-   */
   async getAddress(coinType) {
     if (coinType == null) {
       coinType = 60;
@@ -19199,10 +19051,6 @@ const _EnsResolver = class {
       info: { coinType, data }
     });
   }
-  /**
-   *  Resovles to the EIP-643 text record for %%key%%, or ``null``
-   *  if unconfigured.
-   */
   async getText(key) {
     const data = await __privateMethod(this, _fetch, fetch_fn).call(this, "text(bytes32,string)", [key]);
     if (data == null || data === "0x") {
@@ -19210,9 +19058,6 @@ const _EnsResolver = class {
     }
     return data;
   }
-  /**
-   *  Rsolves to the content-hash or ``null`` if unconfigured.
-   */
   async getContentHash() {
     const data = await __privateMethod(this, _fetch, fetch_fn).call(this, "contenthash()");
     if (data == null || data === "0x") {
@@ -19779,9 +19624,6 @@ const _Network = class {
     }
     return gas;
   }
-  /**
-   *  Returns a new Network for the %%network%% name or chainId.
-   */
   static from(network) {
     injectCommonNetworks();
     if (network == null) {
@@ -23319,7 +23161,7 @@ const Registration = ({ BtnLoad: BtnLoad2, connectWalletHandler, isVoter, regFee
   };
   return /* @__PURE__ */ jsxs(Fragment$1, { children: [
     /* @__PURE__ */ jsx("div", { className: "py-10" }),
-    isVoter.authorised ? isVoter.voted ? "⚫️voted" : "⚪️voter" : "🔴nonvoter",
+    isVoter.authorised ? isVoter.voted ? "⚫️voted" : "🟢voter" : "🔴nonvoter",
     /* @__PURE__ */ jsx("br", {}),
     !isVoter.authorised && (regFee > 0 && "🗳" + parseFloat(formatEther(regFee)) + "🏷"),
     !isVoter.authorised && (regFee > 0 && /* @__PURE__ */ jsx("br", {})),
@@ -23780,7 +23622,7 @@ function App() {
     window.location.reload();
   }
   return (
-    // <BrowserRouter>
+    // <BrowserRouter> // NOTE: use HashRouter instead while deploying the frontend to ipfs
     /* @__PURE__ */ jsxs(HashRouter, { children: [
       /* @__PURE__ */ jsx(Navbar, { theme, toggleTheme, isLoading, account, isAdmin, refreshPage, ensName, ensAvatar, accountBalance, connectWalletHandler, BtnLoad, isOwner, isVoter, nftBalance, chainID, isArtist, isPaused }),
       /* @__PURE__ */ jsxs(Routes, { children: [
