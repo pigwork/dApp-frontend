@@ -12897,9 +12897,6 @@ const _Signature = class {
   }
   /**
    *  The ``r`` value for a signautre.
-   *
-   *  This represents the ``x`` coordinate of a "reference" or
-   *  challenge point, from which the ``y`` can be computed.
    */
   get r() {
     return __privateGet(this, _r);
@@ -12922,13 +12919,6 @@ const _Signature = class {
   }
   /**
    *  The ``v`` value for a signature.
-   *
-   *  Since a given ``x`` value for ``r`` has two possible values for
-   *  its correspondin ``y``, the ``v`` indicates which of the two ``y``
-   *  values to use.
-   *
-   *  It is normalized to the values ``27`` or ``28`` for legacy
-   *  purposes.
    */
   get v() {
     return __privateGet(this, _v);
@@ -12938,17 +12928,9 @@ const _Signature = class {
     assertArgument(v2 === 27 || v2 === 28, "invalid v", "v", value);
     __privateSet(this, _v, v2);
   }
-  /**
-   *  The EIP-155 ``v`` for legacy transactions. For non-legacy
-   *  transactions, this value is ``null``.
-   */
   get networkV() {
     return __privateGet(this, _networkV);
   }
-  /**
-   *  The chain ID for EIP-155 legacy transactions. For non-legacy
-   *  transactions, this value is ``null``.
-   */
   get legacyChainId() {
     const v2 = this.networkV;
     if (v2 == null) {
@@ -12958,16 +12940,10 @@ const _Signature = class {
   }
   /**
    *  The ``yParity`` for the signature.
-   *
-   *  See ``v`` for more details on how this value is used.
    */
   get yParity() {
     return this.v === 27 ? 0 : 1;
   }
-  /**
-   *  The [[link-eip-2098]] compact representation of the ``yParity``
-   *  and ``s`` compacted into a single ``bytes32``.
-   */
   get yParityAndS() {
     const yParityAndS = getBytes(this.s);
     if (this.yParity) {
@@ -12975,24 +12951,15 @@ const _Signature = class {
     }
     return hexlify(yParityAndS);
   }
-  /**
-   *  The [[link-eip-2098]] compact representation.
-   */
   get compactSerialized() {
     return concat([this.r, this.yParityAndS]);
   }
-  /**
-   *  The serialized representation.
-   */
   get serialized() {
     return concat([this.r, this.s, this.yParity ? "0x1c" : "0x1b"]);
   }
   [Symbol.for("nodejs.util.inspect.custom")]() {
     return `Signature { r: "${this.r}", s: "${this.s}", yParity: ${this.yParity}, networkV: ${this.networkV} }`;
   }
-  /**
-   *  Returns a new identical [[Signature]].
-   */
   clone() {
     const clone = new _Signature(_guard$1, this.r, this.s, this.v);
     if (this.networkV) {
@@ -13000,9 +12967,6 @@ const _Signature = class {
     }
     return clone;
   }
-  /**
-   *  Returns a representation that is compatible with ``JSON.stringify``.
-   */
   toJSON() {
     const networkV = this.networkV;
     return {
@@ -13013,16 +12977,6 @@ const _Signature = class {
       v: this.v
     };
   }
-  /**
-   *  Compute the chain ID from the ``v`` in a legacy EIP-155 transactions.
-   *
-   *  @example:
-   *    Signature.getChainId(45)
-   *    //_result:
-   *
-   *    Signature.getChainId(46)
-   *    //_result:
-   */
   static getChainId(v2) {
     const bv = getBigInt(v2, "v");
     if (bv == BN_27$1 || bv == BN_28$1) {
@@ -13031,20 +12985,6 @@ const _Signature = class {
     assertArgument(bv >= BN_35$1, "invalid EIP-155 v", "v", v2);
     return (bv - BN_35$1) / BN_2$2;
   }
-  /**
-   *  Compute the ``v`` for a chain ID for a legacy EIP-155 transactions.
-   *
-   *  Legacy transactions which use [[link-eip-155]] hijack the ``v``
-   *  property to include the chain ID.
-   *
-   *  @example:
-   *    Signature.getChainIdV(5, 27)
-   *    //_result:
-   *
-   *    Signature.getChainIdV(5, 28)
-   *    //_result:
-   *
-   */
   static getChainIdV(chainId, v2) {
     return getBigInt(chainId) * BN_2$2 + BigInt(35 + v2 - 27);
   }
@@ -13152,34 +13092,15 @@ const _SigningKey = class {
     assertArgument(dataLength(privateKey) === 32, "invalid private key", "privateKey", "[REDACTED]");
     __privateSet(this, _privateKey, hexlify(privateKey));
   }
-  /**
-   *  The private key.
-   */
   get privateKey() {
     return __privateGet(this, _privateKey);
   }
-  /**
-   *  The uncompressed public key.
-   *
-   * This will always begin with the prefix ``0x04`` and be 132
-   * characters long (the ``0x`` prefix and 130 hexadecimal nibbles).
-   */
   get publicKey() {
     return _SigningKey.computePublicKey(__privateGet(this, _privateKey));
   }
-  /**
-   *  The compressed public key.
-   *
-   *  This will always begin with either the prefix ``0x02`` or ``0x03``
-   *  and be 68 characters long (the ``0x`` prefix and 33 hexadecimal
-   *  nibbles)
-   */
   get compressedPublicKey() {
     return _SigningKey.computePublicKey(__privateGet(this, _privateKey), true);
   }
-  /**
-   *  Return the signature of the signed %%digest%%.
-   */
   sign(digest) {
     assertArgument(dataLength(digest) === 32, "invalid digest length", "digest", digest);
     const [sigDer, recid] = signSync(getBytesCopy(digest), getBytesCopy(__privateGet(this, _privateKey)), {
@@ -13752,19 +13673,9 @@ const _Typed = class {
   static overrides(v2) {
     return new _Typed(_gaurd, "overrides", Object.assign({}, v2));
   }
-  /**
-   *  Returns true only if %%value%% is a [[Typed]] instance.
-   */
   static isTyped(value) {
     return value && value._typedSymbol === _typedSymbol;
   }
-  /**
-   *  If the value is a [[Typed]] instance, validates the underlying value
-   *  and returns it, otherwise returns value directly.
-   *
-   *  This is useful for functions that with to accept either a [[Typed]]
-   *  object or values.
-   */
   static dereference(value, type) {
     if (_Typed.isTyped(value)) {
       if (value.type !== type) {
@@ -15034,9 +14945,6 @@ function _serializeEip2930(tx, sig) {
   return concat(["0x01", encodeRlp(fields)]);
 }
 const _Transaction = class {
-  /**
-   *  Creates a new Transaction with default values.
-   */
   constructor() {
     __privateAdd(this, _type, void 0);
     __privateAdd(this, _to, void 0);
@@ -15063,12 +14971,6 @@ const _Transaction = class {
     __privateSet(this, _sig, null);
     __privateSet(this, _accessList, null);
   }
-  /**
-   *  The transaction type.
-   *
-   *  If null, the type will be automatically inferred based on
-   *  explicit properties.
-   */
   get type() {
     return __privateGet(this, _type);
   }
@@ -15095,9 +14997,6 @@ const _Transaction = class {
         assertArgument(false, "unsupported transaction type", "type", value);
     }
   }
-  /**
-   *  The name of the transaction type.
-   */
   get typeName() {
     switch (this.type) {
       case 0:
@@ -15109,40 +15008,24 @@ const _Transaction = class {
     }
     return null;
   }
-  /**
-   *  The ``to`` address for the transaction or ``null`` if the
-   *  transaction is an ``init`` transaction.
-   */
   get to() {
     return __privateGet(this, _to);
   }
   set to(value) {
     __privateSet(this, _to, value == null ? null : getAddress(value));
   }
-  /**
-   *  The transaction nonce.
-   */
   get nonce() {
     return __privateGet(this, _nonce);
   }
   set nonce(value) {
     __privateSet(this, _nonce, getNumber(value, "value"));
   }
-  /**
-   *  The gas limit.
-   */
   get gasLimit() {
     return __privateGet(this, _gasLimit);
   }
   set gasLimit(value) {
     __privateSet(this, _gasLimit, getBigInt(value));
   }
-  /**
-   *  The gas price.
-   *
-   *  On legacy networks this defines the fee that will be paid. On
-   *  EIP-1559 networks, this should be ``null``.
-   */
   get gasPrice() {
     const value = __privateGet(this, _gasPrice);
     if (value == null && (this.type === 0 || this.type === 1)) {
@@ -15153,10 +15036,6 @@ const _Transaction = class {
   set gasPrice(value) {
     __privateSet(this, _gasPrice, value == null ? null : getBigInt(value, "gasPrice"));
   }
-  /**
-   *  The maximum priority fee per unit of gas to pay. On legacy
-   *  networks this should be ``null``.
-   */
   get maxPriorityFeePerGas() {
     const value = __privateGet(this, _maxPriorityFeePerGas);
     if (value == null) {
@@ -15170,10 +15049,6 @@ const _Transaction = class {
   set maxPriorityFeePerGas(value) {
     __privateSet(this, _maxPriorityFeePerGas, value == null ? null : getBigInt(value, "maxPriorityFeePerGas"));
   }
-  /**
-   *  The maximum total fee per unit of gas to pay. On legacy
-   *  networks this should be ``null``.
-   */
   get maxFeePerGas() {
     const value = __privateGet(this, _maxFeePerGas);
     if (value == null) {
@@ -15187,49 +15062,30 @@ const _Transaction = class {
   set maxFeePerGas(value) {
     __privateSet(this, _maxFeePerGas, value == null ? null : getBigInt(value, "maxFeePerGas"));
   }
-  /**
-   *  The transaction data. For ``init`` transactions this is the
-   *  deployment code.
-   */
   get data() {
     return __privateGet(this, _data3);
   }
   set data(value) {
     __privateSet(this, _data3, hexlify(value));
   }
-  /**
-   *  The amount of ether to send in this transactions.
-   */
   get value() {
     return __privateGet(this, _value);
   }
   set value(value) {
     __privateSet(this, _value, getBigInt(value, "value"));
   }
-  /**
-   *  The chain ID this transaction is valid on.
-   */
   get chainId() {
     return __privateGet(this, _chainId);
   }
   set chainId(value) {
     __privateSet(this, _chainId, getBigInt(value));
   }
-  /**
-   *  If signed, the signature for this transaction.
-   */
   get signature() {
     return __privateGet(this, _sig) || null;
   }
   set signature(value) {
     __privateSet(this, _sig, value == null ? null : Signature2.from(value));
   }
-  /**
-   *  The access list.
-   *
-   *  An access list permits discounted (but pre-paid) access to
-   *  bytecode and state variable access within contract execution.
-   */
   get accessList() {
     const value = __privateGet(this, _accessList) || null;
     if (value == null) {
@@ -15243,57 +15099,30 @@ const _Transaction = class {
   set accessList(value) {
     __privateSet(this, _accessList, value == null ? null : accessListify(value));
   }
-  /**
-   *  The transaction hash, if signed. Otherwise, ``null``.
-   */
   get hash() {
     if (this.signature == null) {
       return null;
     }
     return keccak256(this.serialized);
   }
-  /**
-   *  The pre-image hash of this transaction.
-   *
-   *  This is the digest that a [[Signer]] must sign to authorize
-   *  this transaction.
-   */
   get unsignedHash() {
     return keccak256(this.unsignedSerialized);
   }
-  /**
-   *  The sending address, if signed. Otherwise, ``null``.
-   */
   get from() {
     if (this.signature == null) {
       return null;
     }
     return recoverAddress(this.unsignedHash, this.signature);
   }
-  /**
-   *  The public key of the sender, if signed. Otherwise, ``null``.
-   */
   get fromPublicKey() {
     if (this.signature == null) {
       return null;
     }
     return SigningKey.recoverPublicKey(this.unsignedHash, this.signature);
   }
-  /**
-   *  Returns true if signed.
-   *
-   *  This provides a Type Guard that properties requiring a signed
-   *  transaction are non-null.
-   */
   isSigned() {
     return this.signature != null;
   }
-  /**
-   *  The serialized transaction.
-   *
-   *  This throws if the transaction is unsigned. For the pre-image,
-   *  use [[unsignedSerialized]].
-   */
   get serialized() {
     assert$1(this.signature != null, "cannot serialize unsigned transaction; maybe you meant .unsignedSerialized", "UNSUPPORTED_OPERATION", { operation: ".serialized" });
     switch (this.inferType()) {
@@ -15306,12 +15135,6 @@ const _Transaction = class {
     }
     assert$1(false, "unsupported transaction type", "UNSUPPORTED_OPERATION", { operation: ".serialized" });
   }
-  /**
-   *  The transaction pre-image.
-   *
-   *  The hash of this is the digest which needs to be signed to
-   *  authorize this transaction.
-   */
   get unsignedSerialized() {
     switch (this.inferType()) {
       case 0:
@@ -15323,17 +15146,9 @@ const _Transaction = class {
     }
     assert$1(false, "unsupported transaction type", "UNSUPPORTED_OPERATION", { operation: ".unsignedSerialized" });
   }
-  /**
-   *  Return the most "likely" type; currently the highest
-   *  supported transaction type.
-   */
   inferType() {
     return this.inferTypes().pop();
   }
-  /**
-   *  Validates the explicit properties and returns a list of compatible
-   *  transaction types.
-   */
   inferTypes() {
     const hasGasPrice = this.gasPrice != null;
     const hasFee = this.maxFeePerGas != null || this.maxPriorityFeePerGas != null;
@@ -15366,45 +15181,18 @@ const _Transaction = class {
     types.sort();
     return types;
   }
-  /**
-   *  Returns true if this transaction is a legacy transaction (i.e.
-   *  ``type === 0``).
-   *
-   *  This provides a Type Guard that the related properties are
-   *  non-null.
-   */
   isLegacy() {
     return this.type === 0;
   }
-  /**
-   *  Returns true if this transaction is berlin hardform transaction (i.e.
-   *  ``type === 1``).
-   *
-   *  This provides a Type Guard that the related properties are
-   *  non-null.
-   */
   isBerlin() {
     return this.type === 1;
   }
-  /**
-   *  Returns true if this transaction is london hardform transaction (i.e.
-   *  ``type === 2``).
-   *
-   *  This provides a Type Guard that the related properties are
-   *  non-null.
-   */
   isLondon() {
     return this.type === 2;
   }
-  /**
-   *  Create a copy of this transaciton.
-   */
   clone() {
     return _Transaction.from(this);
   }
-  /**
-   *  Return a JSON-friendly object.
-   */
   toJSON() {
     const s = (v2) => {
       if (v2 == null) {
@@ -15428,10 +15216,6 @@ const _Transaction = class {
       accessList: this.accessList
     };
   }
-  /**
-   *  Create a **Transaction** from a serialized transaction or a
-   *  Transaction-like object.
-   */
   static from(tx) {
     if (tx == null) {
       return new _Transaction();
@@ -16271,46 +16055,18 @@ const _ParamType = class {
     }
     return result;
   }
-  /*
-   *  Returns true if %%value%% is an Array type.
-   *
-   *  This provides a type gaurd ensuring that the
-   *  [[arrayChildren]] and [[arrayLength]] are non-null.
-   */
   //static isArray(value: any): value is { arrayChildren: ParamType, arrayLength: number } {
   //    return value && (value.baseType === "array")
   //}
-  /**
-   *  Returns true if %%this%% is an Array type.
-   *
-   *  This provides a type gaurd ensuring that [[arrayChildren]]
-   *  and [[arrayLength]] are non-null.
-   */
   isArray() {
     return this.baseType === "array";
   }
-  /**
-   *  Returns true if %%this%% is a Tuple type.
-   *
-   *  This provides a type gaurd ensuring that [[components]]
-   *  is non-null.
-   */
   isTuple() {
     return this.baseType === "tuple";
   }
-  /**
-   *  Returns true if %%this%% is an Indexable type.
-   *
-   *  This provides a type gaurd ensuring that [[indexed]]
-   *  is non-null.
-   */
   isIndexable() {
     return this.indexed != null;
   }
-  /**
-   *  Walks the **ParamType** with %%value%%, calling %%process%%
-   *  on each type, destructing the %%value%% recursively.
-   */
   walk(value, process2) {
     if (this.isArray()) {
       if (!Array.isArray(value)) {
@@ -16334,13 +16090,6 @@ const _ParamType = class {
     }
     return process2(this.type, value);
   }
-  /**
-   *  Walks the **ParamType** with %%value%%, asynchronously calling
-   *  %%process%% on each type, destructing the %%value%% recursively.
-   *
-   *  This can be used to resolve ENS naes by walking and resolving each
-   *  ``"address"`` type.
-   */
   async walkAsync(value, process2) {
     const promises = [];
     const result = [value];
@@ -16352,12 +16101,6 @@ const _ParamType = class {
     }
     return result[0];
   }
-  /**
-   *  Creates a new **ParamType** for %%obj%%.
-   *
-   *  If %%allowIndexed%% then the ``indexed`` keyword is permitted,
-   *  otherwise the ``indexed`` keyword will throw an error.
-   */
   static from(obj, allowIndexed) {
     if (_ParamType.isParamType(obj)) {
       return obj;
@@ -16493,26 +16236,13 @@ walkAsync_fn = function(promises, value, process2, setValue) {
   }
 };
 class Fragment {
-  /**
-   *  @private
-   */
   constructor(guard, type, inputs) {
-    /**
-     *  The type of the fragment.
-     */
     __publicField(this, "type");
-    /**
-     *  The inputs for the fragment.
-     */
     __publicField(this, "inputs");
     assertPrivate(guard, _guard, "Fragment");
     inputs = Object.freeze(inputs.slice());
     defineProperties(this, { type, inputs });
   }
-  /**
-   *  Creates a new **Fragment** for %%obj%%, wich can be any supported
-   *  ABI frgament type.
-   */
   static from(obj) {
     if (typeof obj === "string") {
       try {
@@ -16560,46 +16290,25 @@ class Fragment {
     }
     assertArgument(false, "unsupported frgament object", "obj", obj);
   }
-  /**
-   *  Returns true if %%value%% is a [[ConstructorFragment]].
-   */
   static isConstructor(value) {
     return ConstructorFragment.isFragment(value);
   }
-  /**
-   *  Returns true if %%value%% is an [[ErrorFragment]].
-   */
   static isError(value) {
     return ErrorFragment.isFragment(value);
   }
-  /**
-   *  Returns true if %%value%% is an [[EventFragment]].
-   */
   static isEvent(value) {
     return EventFragment.isFragment(value);
   }
-  /**
-   *  Returns true if %%value%% is a [[FunctionFragment]].
-   */
   static isFunction(value) {
     return FunctionFragment.isFragment(value);
   }
-  /**
-   *  Returns true if %%value%% is a [[StructFragment]].
-   */
   static isStruct(value) {
     return StructFragment.isFragment(value);
   }
 }
 class NamedFragment extends Fragment {
-  /**
-   *  @private
-   */
   constructor(guard, type, name, inputs) {
     super(guard, type, inputs);
-    /**
-     *  The name of the fragment.
-     */
     __publicField(this, "name");
     assertArgument(typeof name === "string" && name.match(regexId), "invalid identifier", "name", name);
     inputs = Object.freeze(inputs.slice());
@@ -16610,16 +16319,10 @@ function joinParams(format, params) {
   return "(" + params.map((p2) => p2.format(format)).join(format === "full" ? ", " : ",") + ")";
 }
 class ErrorFragment extends NamedFragment {
-  /**
-   *  @private
-   */
   constructor(guard, name, inputs) {
     super(guard, "error", name, inputs);
     Object.defineProperty(this, internal$1, { value: ErrorFragmentInternal });
   }
-  /**
-   *  The Custom Error selector.
-   */
   get selector() {
     return id(this.format("sighash")).substring(0, 10);
   }
@@ -16660,18 +16363,12 @@ class ErrorFragment extends NamedFragment {
   }
 }
 class EventFragment extends NamedFragment {
-  /**
-   *  @private
-   */
   constructor(guard, name, inputs, anonymous) {
     super(guard, "event", name, inputs);
     __publicField(this, "anonymous");
     Object.defineProperty(this, internal$1, { value: EventFragmentInternal });
     defineProperties(this, { anonymous });
   }
-  /**
-   *  The Event topic hash.
-   */
   get topicHash() {
     return id(this.format("sighash"));
   }
@@ -16836,31 +16533,12 @@ class FallbackFragment extends Fragment {
   }
 }
 class FunctionFragment extends NamedFragment {
-  /**
-   *  @private
-   */
   constructor(guard, name, stateMutability, inputs, outputs, gas) {
     super(guard, "function", name, inputs);
-    /**
-     *  If the function is constant (e.g. ``pure`` or ``view`` functions).
-     */
     __publicField(this, "constant");
-    /**
-     *  The returned types for the result of calling this function.
-     */
     __publicField(this, "outputs");
-    /**
-     *  The state mutability (e.g. ``payable``, ``nonpayable``, ``view``
-     *  or ``pure``)
-     */
     __publicField(this, "stateMutability");
-    /**
-     *  If the function can be sent value during invocation.
-     */
     __publicField(this, "payable");
-    /**
-     *  The amount of gas to send when calling this function
-     */
     __publicField(this, "gas");
     Object.defineProperty(this, internal$1, { value: FunctionFragmentInternal });
     outputs = Object.freeze(outputs.slice());
@@ -16868,9 +16546,6 @@ class FunctionFragment extends NamedFragment {
     const payable = stateMutability === "payable";
     defineProperties(this, { constant, gas, outputs, payable, stateMutability });
   }
-  /**
-   *  The Function selector.
-   */
   get selector() {
     return id(this.format("sighash")).substring(0, 10);
   }
@@ -16939,9 +16614,6 @@ class FunctionFragment extends NamedFragment {
   }
 }
 class StructFragment extends NamedFragment {
-  /**
-   *  @private
-   */
   constructor(guard, name, inputs) {
     super(guard, "struct", name, inputs);
     Object.defineProperty(this, internal$1, { value: StructFragmentInternal });
@@ -17040,22 +16712,11 @@ const _AbiCoder = class {
   constructor() {
     __privateAdd(this, _getCoder);
   }
-  /**
-   *  Get the default values for the given %%types%%.
-   *
-   *  For example, a ``uint`` is by default ``0`` and ``bool``
-   *  is by default ``false``.
-   */
   getDefaultValue(types) {
     const coders = types.map((type) => __privateMethod(this, _getCoder, getCoder_fn).call(this, ParamType.from(type)));
     const coder = new TupleCoder(coders, "_");
     return coder.defaultValue();
   }
-  /**
-   *  Encode the %%values%% as the %%types%% into ABI data.
-   *
-   *  @returns DataHexstring
-   */
   encode(types, values) {
     assertArgumentCount(values.length, types.length, "types/values length mismatch");
     const coders = types.map((type) => __privateMethod(this, _getCoder, getCoder_fn).call(this, ParamType.from(type)));
@@ -17064,34 +16725,17 @@ const _AbiCoder = class {
     coder.encode(writer, values);
     return writer.data;
   }
-  /**
-   *  Decode the ABI %%data%% as the %%types%% into values.
-   *
-   *  If %%loose%% decoding is enabled, then strict padding is
-   *  not enforced. Some older versions of Solidity incorrectly
-   *  padded event data emitted from ``external`` functions.
-   */
   decode(types, data, loose) {
     const coders = types.map((type) => __privateMethod(this, _getCoder, getCoder_fn).call(this, ParamType.from(type)));
     const coder = new TupleCoder(coders, "_");
     return coder.decode(new Reader(data, loose));
   }
-  /**
-   *  Returns the shared singleton instance of a default [[AbiCoder]].
-   *
-   *  On the first call, the instance is created internally.
-   */
   static defaultAbiCoder() {
     if (defaultCoder == null) {
       defaultCoder = new _AbiCoder();
     }
     return defaultCoder;
   }
-  /**
-   *  Returns an ethers-compatible [[CallExceptionError]] Error for the given
-   *  result %%data%% for the [[CallExceptionAction]] %%action%% against
-   *  the Transaction %%tx%%.
-   */
   static getBuiltinCallException(action, tx, data) {
     return getBuiltinCallException(action, tx, data, _AbiCoder.defaultAbiCoder());
   }
@@ -17229,29 +16873,14 @@ const BuiltinErrors = {
   }
 };
 const _Interface = class {
-  /**
-   *  Create a new Interface for the %%fragments%%.
-   */
   constructor(fragments) {
     // Find a function definition by any means necessary (unless it is ambiguous)
     __privateAdd(this, _getFunction);
     // Find an event definition by any means necessary (unless it is ambiguous)
     __privateAdd(this, _getEvent);
-    /**
-     *  All the Contract ABI members (i.e. methods, events, errors, etc).
-     */
     __publicField(this, "fragments");
-    /**
-     *  The Contract constructor.
-     */
     __publicField(this, "deploy");
-    /**
-     *  The Fallback method, if any.
-     */
     __publicField(this, "fallback");
-    /**
-     *  If receiving ether is supported.
-     */
     __publicField(this, "receive");
     __privateAdd(this, _errors, void 0);
     __privateAdd(this, _events, void 0);
@@ -17325,56 +16954,26 @@ const _Interface = class {
     }
     defineProperties(this, { fallback, receive });
   }
-  /**
-   *  Returns the entire Human-Readable ABI, as an array of
-   *  signatures, optionally as %%minimal%% strings, which
-   *  removes parameter names and unneceesary spaces.
-   */
   format(minimal) {
     const format = minimal ? "minimal" : "full";
     const abi2 = this.fragments.map((f2) => f2.format(format));
     return abi2;
   }
-  /**
-   *  Return the JSON-encoded ABI. This is the format Solidiy
-   *  returns.
-   */
   formatJson() {
     const abi2 = this.fragments.map((f2) => f2.format("json"));
     return JSON.stringify(abi2.map((j) => JSON.parse(j)));
   }
-  /**
-   *  The ABI coder that will be used to encode and decode binary
-   *  data.
-   */
   getAbiCoder() {
     return AbiCoder.defaultAbiCoder();
   }
-  /**
-   *  Get the function name for %%key%%, which may be a function selector,
-   *  function name or function signature that belongs to the ABI.
-   */
   getFunctionName(key) {
     const fragment = __privateMethod(this, _getFunction, getFunction_fn).call(this, key, null, false);
     assertArgument(fragment, "no matching function", "key", key);
     return fragment.name;
   }
-  /**
-   *  Get the [[FunctionFragment]] for %%key%%, which may be a function
-   *  selector, function name or function signature that belongs to the ABI.
-   *
-   *  If %%values%% is provided, it will use the Typed API to handle
-   *  ambiguous cases where multiple functions match by name.
-   *
-   *  If the %%key%% and %%values%% do not refine to a single function in
-   *  the ABI, this will throw.
-   */
   getFunction(key, values) {
     return __privateMethod(this, _getFunction, getFunction_fn).call(this, key, values || null, true);
   }
-  /**
-   *  Iterate over all functions, calling %%callback%%, sorted by their name.
-   */
   forEachFunction(callback) {
     const names2 = Array.from(__privateGet(this, _functions).keys());
     names2.sort((a, b2) => a.localeCompare(b2));
@@ -17383,10 +16982,6 @@ const _Interface = class {
       callback(__privateGet(this, _functions).get(name), i);
     }
   }
-  /**
-   *  Get the event name for %%key%%, which may be a topic hash,
-   *  event name or event signature that belongs to the ABI.
-   */
   getEventName(key) {
     const fragment = __privateMethod(this, _getEvent, getEvent_fn).call(this, key, null, false);
     assertArgument(fragment, "no matching event", "key", key);
@@ -17395,9 +16990,6 @@ const _Interface = class {
   getEvent(key, values) {
     return __privateMethod(this, _getEvent, getEvent_fn).call(this, key, values || null, true);
   }
-  /**
-   *  Iterate over all events, calling %%callback%%, sorted by their name.
-   */
   forEachEvent(callback) {
     const names2 = Array.from(__privateGet(this, _events).keys());
     names2.sort((a, b2) => a.localeCompare(b2));
@@ -17528,14 +17120,6 @@ const _Interface = class {
       this._encodeParams(fragment.inputs, values || [])
     ]);
   }
-  /**
-   *  Decodes the %%data%% from a transaction ``tx.data`` for
-   *  the function specified (see [[getFunction]] for valid values
-   *  for %%fragment%%).
-   *
-   *  Most developers should prefer the [[parseTransaction]] method
-   *  instead, which will automatically detect the fragment.
-   */
   decodeFunctionData(fragment, data) {
     if (typeof fragment === "string") {
       const f2 = this.getFunction(fragment);
@@ -17545,11 +17129,6 @@ const _Interface = class {
     assertArgument(dataSlice(data, 0, 4) === fragment.selector, `data signature does not match function ${fragment.name}.`, "data", data);
     return this._decodeParams(fragment.inputs, dataSlice(data, 4));
   }
-  /**
-   *  Encodes the ``tx.data`` for a transaction that calls the function
-   *  specified (see [[getFunction]] for valid values for %%fragment%%) with
-   *  the %%values%%.
-   */
   encodeFunctionData(fragment, values) {
     if (typeof fragment === "string") {
       const f2 = this.getFunction(fragment);
